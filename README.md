@@ -4,9 +4,9 @@ bill@ubuntu:~/github/uboot$ cat README.md
 
 ### 1 The Directory Structure
 ```
-    buildroot    -- Buildroot souce codes, I use 2018.05 version  
-    custom-app   -- Our linux module/driver source codes
-    external     -- Outside of the Buildroot tree, using the br2-external mechanism
+    buildroot    # Buildroot souce codes, I use 2018.05 version  
+    custom-app   # Our linux module/driver source codes
+    external     # Outside of the Buildroot tree, using the br2-external mechanism
 ```
 I will proivide the details of external directory:
 ```
@@ -49,21 +49,19 @@ I will proivide the details of external directory:
 Make build for beaglebone black as follows.
 ```
     make BR2_EXTERNAL=$PWD/external -C $PWD/buildroot O=$PWD/output-bbb labs_defconfig
-	cd $PWD/output-bbb
+    cd $PWD/output-bbb
     make -C ../buildroot O=$(pwd) menuconfig
     make beaglebone-defconfig
     make menuconfig
     make
-	
-	make savedefconfig          - Save current config to BR2_DEFCONFIG (minimal config)  
+    make savedefconfig          # Save current config to BR2_DEFCONFIG (minimal config)  
 ```
 
 If you want to config linux, the following commands are helpful.
 ```
-    make linux-menuconfig       - Run Linux kernel menuconfig
-    make linux-savedefconfig    - Run Linux kernel savedefconfig
-    make linux-update-defconfig - Save the Linux configuration to the path specified
-
+    make linux-menuconfig       # Run Linux kernel menuconfig
+    make linux-savedefconfig    # Run Linux kernel savedefconfig
+    make linux-update-defconfig # Save the Linux configuration to the path specified
 ```
 Make build for qemu as follows.
 ```
@@ -146,8 +144,12 @@ We can boot from tftp server and NFS server, using following uEnv.txt
 ```
 #### 3.5 Make the Linux Dervice Driver
 I will use the example in the excellent book: Linux Device Drivers, Third Edition (https://lwn.net/Kernel/LDD3/).
-
-
+```
+    make ldd-misc-modules-rebuild
+    make 
+    make update-servers
+```
+NOTE: I add the customize "make update-servers" to update the tftp and nfs server. Please refer to external.mk for details.
 
 ### 4 Run the build using Qemu and debug linux kernel module
 
@@ -161,7 +163,7 @@ I will use the example in the excellent book: Linux Device Drivers, Third Editio
         -append "console=ttyAMA0,115200 root=/dev/mmcblk0" \
         -serial mon:stdio \
         -net nic,model=lan9118 -net user
-		-s -S
+        -s -S
 ```	
 
 #### 4.2 Start to Debug kernel module using GDB
