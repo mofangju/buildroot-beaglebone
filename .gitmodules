@@ -1,0 +1,6 @@
+[submodule "buildroot"]
+	path = buildroot
+	url = git://git.busybox.net/buildroot
+[submodule "custom-app/ldd"]
+	path = custom-app/ldd
+	url = https://github.com/martinezjavier/ldd3.git

@@ -1,0 +1,5 @@
+config BR2_PACKAGE_LDD_SCULL
+    bool "ldd-scull"
+    help
+        This project run the famous book Linux Device Driver.
+        https://github.com/martinezjavier/ldd3

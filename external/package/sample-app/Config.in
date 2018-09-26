@@ -1,0 +1,6 @@
+config BR2_PACKAGE_SAMPLE_APP
+	bool "sample-app"
+	help
+	  Sample app just for a test. Please refer to following:
+
+	  http://fbgrab.monells.se/

@@ -1,0 +1,14 @@
+fdtfile=am335x-boneblack.dtb
+fdtaddr=0x88000000
+bootfile=zImage
+loadaddr=0x82000000
+console=ttyO0,115200n8
+serverip=192.168.0.104
+ipaddr=192.168.0.105
+rootpath=/rootfs
+netloadfdt=tftp ${fdtaddr} ${fdtfile}
+netloadimage=tftp ${loadaddr} ${bootfile}
+netargs=setenv bootargs console=${console} ${optargs} root=/dev/nfs nfsroot=${serverip}:${rootpath},nolock,nfsvers=3 rw rootwait ip=${ipaddr}
+netboot=echo Booting from network ...; setenv autoload no; run netloadimage; run netloadfdt; run netargs; bootz ${loadaddr} - ${fdtaddr}
+uenvcmd=run netboot
+

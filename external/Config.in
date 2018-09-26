@@ -1,0 +1,3 @@
+source "$BR2_EXTERNAL_LABS_PATH/package/ldd-misc-modules/Config.in"
+source "$BR2_EXTERNAL_LABS_PATH/package/ldd-scull/Config.in"
+source "$BR2_EXTERNAL_LABS_PATH/package/sample-app/Config.in"

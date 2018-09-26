@@ -1,0 +1,5 @@
+config BR2_PACKAGE_LDD_MISC_MODULES
+    bool "ldd-misc-modules"
+    help
+        This project run the famous book Linux Device Driver.
+        https://github.com/martinezjavier/ldd3
