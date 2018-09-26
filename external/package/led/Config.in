@@ -1,0 +1,4 @@
+config BR2_PACKAGE_LED
+    bool "led"
+    help
+        This project demo LED and button

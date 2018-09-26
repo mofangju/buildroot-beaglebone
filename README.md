@@ -1,14 +1,14 @@
-bill@ubuntu:~/github/uboot$ cat README.md 
-
 # Buildroot for Beaglebone Black
 
-### 1 The Directory Structure
+### 1 The Buildroot Out-of-Tree Directory Structure
+
+After GIT clone this repository, please update submodule.
 ```
-    buildroot    # Buildroot souce codes, I use 2018.05 version  
-    custom-app   # Our linux module/driver source codes
-    external     # Outside of the Buildroot tree, using the br2-external mechanism
+    git submodule init
+    git submodule update
 ```
-I will proivide the details of external directory:
+To avoid source code mixed with buildroot or linux kernel, the custome-app directory contains the linux module/driver source codes. 
+The br2-external mechanism is adopted, the outside of the Buildroot tree is external directory, as follows.
 ```
     external/
     ├── board
@@ -40,18 +40,27 @@ I will proivide the details of external directory:
         ├── ldd-scull
         │   ├── Config.in
         │   └── ldd-scull.mk
+        ├── led
+        │   ├── Config.in
+        │   └── led.mk
         └── sample-app
             ├── Config.in
             └── sample-app.mk
 ```
 
-### 2 The Directory Structure
+### 2 Start to Build
+
+I adopt Buildroot 2018.05 verion.
+```
+    cd buildroot
+    git checkout -b v2018.05 2018.05
+```
+
 Make build for beaglebone black as follows.
 ```
     make BR2_EXTERNAL=$PWD/external -C $PWD/buildroot O=$PWD/output-bbb labs_defconfig
     cd $PWD/output-bbb
     make -C ../buildroot O=$(pwd) menuconfig
-    make beaglebone-defconfig
     make menuconfig
     make
     make savedefconfig          # Save current config to BR2_DEFCONFIG (minimal config)  
@@ -65,16 +74,12 @@ If you want to config linux, the following commands are helpful.
 ```
 Make build for qemu as follows.
 ```
-    make BR2_EXTERNAL=$PWD/external -C $PWD/buildroot O=$PWD/output-qemu labs_defconfig
+    make BR2_EXTERNAL=$PWD/external -C $PWD/buildroot O=$PWD/output-qemu qemu_defconfig
     make -C $PWD/output-qemu
 ```	
-As the results, you will get following directories:    
-```
-    output-bbb
-    output-qemu
-```
+As the results, you will get two directories: output-bbb, output-qemu. 
 
-### 3 Run the build for Beaglebone Black
+### 3 Run the Build for Beaglebone Black
 
 #### 3.1 Serial Debug Console Cable 
 
@@ -84,7 +89,6 @@ https://www.adafruit.com/product/954.
 Install minicom (Linux) or putty (Windows) on the Host computer. Set the
 serial port (usb to serial board) to 115200 baud, 8 data bits, no
 parity, 1 stop bit, no flow control. 
-
 
 #### 3.2 Prepare the bootable SD card
 
@@ -142,22 +146,39 @@ We can boot from tftp server and NFS server, using following uEnv.txt
     netboot=echo Booting from network ...; setenv autoload no; run netloadimage; run netloadfdt; run netargs; bootz ${loadaddr} - ${fdtaddr}
     uenvcmd=run netboot
 ```
-#### 3.5 Make the Linux Dervice Driver
-I will use the example in the excellent book: Linux Device Drivers, Third Edition (https://lwn.net/Kernel/LDD3/).
+### 4 The Examples 
+
+#### 4.1 Simplest sample app
+If you want to add some executables in the build, just follow my sample-app example.
+
+#### 4.2 Scull from Linux Dervice Driver  
+I will use the example in the book: Linux Device Drivers, Third Edition (https://lwn.net/Kernel/LDD3/).
 ```
     make ldd-misc-modules-rebuild
     make 
     make update-servers
 ```
-NOTE: I add the customized "make update-servers" to update the tftp and nfs server. Please refer to external.mk for details.
+NOTE: I add the customized "make update-servers" to update the tftp and nfs server with the latest build. Please refer to external.mk for details.
 
 Now you can reboot your Beaglebone black to verify if it works.
 
-### 4 Run the build using Qemu and debug linux kernel module
+#### 4.3 GPIO driver for Button and LED
 
-#### 4.1 Run in Qemu 
+This example need breadboard to setup some circuit connect beaglebone's GPIO, button, and LED. For details, please refer to http://derekmolloy.ie/kernel-gpio-programming-buttons-and-leds. It introduces kobjects and a mechanism for adding your own entries to Sysfs. This allows you to send data to and receive data from the LKM at run time. 
+
+We can use breadboard to connect GPIO with Button LED. I have adapted the source codes a little to work in current linux version.
+
 ```
-    output-qemu
+    make led-rebuild
+    make 
+    make update-servers
+```
+
+### 5 Run the build using Qemu and debug linux kernel module
+
+To run in Qemu, execute:
+```
+    cd output-qemu
     qemu-system-arm -M vexpress-a9 -smp 1 -m 256 -display none \
         -kernel "$OUTPUT_PATH"/images/zImage \
         -dtb "$OUTPUT_PATH"/images/vexpress-v2p-ca9.dtb \
@@ -168,7 +189,7 @@ Now you can reboot your Beaglebone black to verify if it works.
         -s -S
 ```	
 
-#### 4.2 Start to Debug kernel module using GDB
+#### 5.1 Start to Debug kernel module using GDB
 ```
     ~/bbb/output-qemu/build/linux-4.14$ arm-linux-gnueabihf-gdb vmlinux
     GNU gdb (Linaro_GDB-2017.11) 8.0.1.20171119-git
@@ -195,7 +216,7 @@ Now you can reboot your Beaglebone black to verify if it works.
     Continuing.
 ```
 
-#### 4.3 Get address In Qemu console
+#### 5.2 Get address In Qemu console
 ```
     Welcome to Buildroot
     buildroot login: root
@@ -228,7 +249,7 @@ Now you can reboot your Beaglebone black to verify if it works.
     0x7f000000
 ```
 
-#### 4.4 Continue to Debug kernel module using GDB
+#### 5.3 Continue to Debug kernel module using GDB
 
 ```
     ^C
