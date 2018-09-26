@@ -149,7 +149,9 @@ I will use the example in the excellent book: Linux Device Drivers, Third Editio
     make 
     make update-servers
 ```
-NOTE: I add the customize "make update-servers" to update the tftp and nfs server. Please refer to external.mk for details.
+NOTE: I add the customized "make update-servers" to update the tftp and nfs server. Please refer to external.mk for details.
+
+Now you can reboot your Beaglebone black to verify if it works.
 
 ### 4 Run the build using Qemu and debug linux kernel module
 
